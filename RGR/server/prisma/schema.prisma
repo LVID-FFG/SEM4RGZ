@@ -1,0 +1,101 @@
+// server/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String?   // убрали @unique
+  password      String
+  role          String
+  fullName      String?
+  approved      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String?
+  twoFactorSecret String?
+  twoFactorEnabled Boolean  @default(false)
+
+  doorsCreated  Door[]    @relation("UserCreatedDoor")
+  doorsUpdated  Door[]    @relation("UserUpdatedDoor")
+  doorsDeleted  Door[]    @relation("UserDeletedDoor")
+  sealsInstalled Seal[]   @relation("UserInstalledSeal")
+  sealsRemoved  Seal[]    @relation("UserRemovedSeal")
+  sealsBroken   Seal[]    @relation("UserBrokenSeal")
+  sealsDisabled Seal[]    @relation("UserDisabledSeal")
+  sealsEnabled  Seal[]    @relation("UserEnabledSeal")
+  auditLogs     AuditLog[]
+}
+
+model Door {
+  id            String    @id @default(cuid())
+  name          String
+  floor         String
+  location      String
+  type          String    @default("other")
+  description   String?
+  responsible   String?
+  hasSeal       Boolean   @default(false)
+  x             Int       @default(100)
+  y             Int       @default(200)
+  width         Int       @default(80)
+  height        Int       @default(40)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  createdBy     String?
+  createdUser   User?     @relation("UserCreatedDoor", fields: [createdBy], references: [id])
+  updatedBy     String?
+  updatedUser   User?     @relation("UserUpdatedDoor", fields: [updatedBy], references: [id])
+  deletedBy     String?
+  deletedUser   User?     @relation("UserDeletedDoor", fields: [deletedBy], references: [id])
+
+  seals         Seal[]
+  auditLogs     AuditLog[]
+}
+
+model Seal {
+  id              String    @id @default(cuid())
+  doorId          String
+  door            Door      @relation(fields: [doorId], references: [id])
+  installedAt     DateTime  @default(now())
+  removedAt       DateTime?
+  brokenAt        DateTime?
+  disabledAt      DateTime?
+  enabledAt       DateTime?
+  status          String    @default("installed")
+
+  installedBy     String?
+  installedUser   User?     @relation("UserInstalledSeal", fields: [installedBy], references: [id])
+  removedBy       String?
+  removedUser     User?     @relation("UserRemovedSeal", fields: [removedBy], references: [id])
+  brokenBy        String?
+  brokenUser      User?     @relation("UserBrokenSeal", fields: [brokenBy], references: [id])
+  disabledBy      String?
+  disabledUser    User?     @relation("UserDisabledSeal", fields: [disabledBy], references: [id])
+  enabledBy       String?
+  enabledUser     User?     @relation("UserEnabledSeal", fields: [enabledBy], references: [id])
+
+  auditLogs       AuditLog[] @relation("SealAuditLogs")
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  timestamp   DateTime  @default(now())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
+  userName    String?
+  action      String
+  doorId      String?
+  door        Door?     @relation(fields: [doorId], references: [id])
+  sealId      String?
+  seal        Seal?     @relation("SealAuditLogs", fields: [sealId], references: [id])
+  details     String?
+  hash        String
+}
