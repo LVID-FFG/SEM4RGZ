@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String?
+  password      String
+  role          String
+  twoFactorEnabled  Boolean   @default(false)
+  fullName      String?
+  approved      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String?
+
+  // Самоссылающаяся связь
+  createdUser   User?     @relation("UserCreated", fields: [createdBy], references: [id], onDelete: SetNull)
+  createdUsers  User[]    @relation("UserCreated")
+
+  // Связи с Door
+  doorsCreated  Door[]    @relation("UserCreatedDoor")
+  doorsUpdated  Door[]    @relation("UserUpdatedDoor")
+
+  // Связи с Seal (через changedBy)
+  sealsChanged  Seal[]    @relation("UserChangedSeal")
+
+  // Связь с AuditLog
+  auditLogs     AuditLog[] @relation("UserAuditLog")
+}
+
+model Door {
+  id            String    @id @default(cuid())
+  name          String
+  floor         String
+  location      String
+  type          String    @default("other")
+  description   String?
+  responsible   String?
+  hasSeal       Boolean   @default(false)
+  x             Int       @default(100)
+  y             Int       @default(200)
+  width         Int       @default(80)
+  height        Int       @default(40)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  createdBy     String?
+  updatedBy     String?
+
+  createdUser   User?     @relation("UserCreatedDoor", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedUser   User?     @relation("UserUpdatedDoor", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  seals         Seal[]    @relation("DoorSeal")
+  auditLogs     AuditLog[] @relation("DoorAuditLog")
+}
+
+model Seal {
+  id            String    @id @default(cuid())
+  doorId        String
+  door          Door      @relation("DoorSeal", fields: [doorId], references: [id], onDelete: Cascade)
+  status        String    @default("installed")
+  changedAt     DateTime  @default(now())
+  changedBy     String?
+
+  changedUser   User?     @relation("UserChangedSeal", fields: [changedBy], references: [id], onDelete: SetNull)
+
+  auditLogs     AuditLog[] @relation("SealAuditLogs")
+}
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  timestamp     DateTime  @default(now())
+  userId        String?
+  user          User?     @relation("UserAuditLog", fields: [userId], references: [id], onDelete: SetNull)
+  userName      String?
+  action        String
+  doorId        String?
+  door          Door?     @relation("DoorAuditLog", fields: [doorId], references: [id], onDelete: SetNull)
+  doorName      String?
+  sealId        String?
+  seal          Seal?     @relation("SealAuditLogs", fields: [sealId], references: [id], onDelete: SetNull)
+  details       String?
+  hash          String
+}
