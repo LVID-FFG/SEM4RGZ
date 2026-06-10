@@ -1243,6 +1243,5 @@ app.post('/api/alert', authenticateToken, requireApproved(), csrfProtection, ale
 ensureBootstrapAdmin();
 
 app.listen(PORT, () => {
-    logger.info(`[Server] Сервер запущен на http://localhost:${PORT}`);
-    logger.info(`Документация Swagger доступна по адресу: http://localhost:${PORT}/api-docs`);
+    logger.info(`[Server] Сервер запущен на порту ${PORT}`);
 });
