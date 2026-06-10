@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "twoFactorEnabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "default": false
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdUser": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "doorsCreated": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Door"
+          }
+        },
+        "doorsUpdated": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Door"
+          }
+        },
+        "sealsChanged": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Seal"
+          }
+        },
+        "auditLogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuditLog"
+          }
+        }
+      }
+    },
+    "Door": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "floor": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "default": "other"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "responsible": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hasSeal": {
+          "type": "boolean",
+          "default": false
+        },
+        "x": {
+          "type": "integer",
+          "default": 100
+        },
+        "y": {
+          "type": "integer",
+          "default": 200
+        },
+        "width": {
+          "type": "integer",
+          "default": 80
+        },
+        "height": {
+          "type": "integer",
+          "default": 40
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "default": false
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdUser": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updatedUser": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "seals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Seal"
+          }
+        },
+        "auditLogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuditLog"
+          }
+        }
+      }
+    },
+    "Seal": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "door": {
+          "$ref": "#/definitions/Door"
+        },
+        "status": {
+          "type": "string",
+          "default": "installed"
+        },
+        "changedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "changedUser": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "auditLogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuditLog"
+          }
+        }
+      }
+    },
+    "AuditLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "userName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action": {
+          "type": "string"
+        },
+        "door": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Door"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "doorName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "seal": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Seal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "details": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hash": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "user": {
+      "$ref": "#/definitions/User"
+    },
+    "door": {
+      "$ref": "#/definitions/Door"
+    },
+    "seal": {
+      "$ref": "#/definitions/Seal"
+    },
+    "auditLog": {
+      "$ref": "#/definitions/AuditLog"
+    }
+  }
+}
