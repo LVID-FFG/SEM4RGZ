@@ -23,7 +23,6 @@ model User {
   isDeleted     Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  createdBy     String?
 
   createdUser   User?     @relation("UserCreated", fields: [createdBy], references: [id], onDelete: SetNull)
   createdUsers  User[]    @relation("UserCreated")
@@ -78,11 +77,9 @@ model AuditLog {
   timestamp     DateTime  @default(now())
   userId        String?
   user          User?     @relation("UserAuditLog", fields: [userId], references: [id], onDelete: Restrict)
-  userName      String?
   action        String
   doorId        String?
   door          Door?     @relation("DoorAuditLog", fields: [doorId], references: [id], onDelete: Restrict)
-  doorName      String?
   sealId        String?
   seal          Seal?     @relation("SealAuditLogs", fields: [sealId], references: [id], onDelete: Cascade)
   details       String?
